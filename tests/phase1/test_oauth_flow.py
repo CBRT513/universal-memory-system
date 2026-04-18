@@ -313,6 +313,157 @@ def test_refresh_token_rotation(client):
     assert resp.json()["error"] == "invalid_grant"
 
 
+def _seed_confidential_client(
+    redirect_uri: str = "https://confidential.example.com/cb",
+    *,
+    client_id: str = "confidential-test",
+    client_secret: str = "s3cr3t-confidential-value",
+    scope: list[str] | None = None,
+) -> tuple[str, str]:
+    """Seed a confidential (client_secret_post) OAuth client. Returns (id, secret)."""
+    from galactica_mcp import oauth_storage
+    oauth_storage.save_client(oauth_storage.OAuthClient(
+        client_id=client_id,
+        client_secret=client_secret,
+        client_name="Confidential Test Client",
+        redirect_uris=[redirect_uri],
+        grant_types=["authorization_code", "refresh_token"],
+        response_types=["code"],
+        scope=scope or ["memory:read"],
+        token_endpoint_auth_method="client_secret_post",
+    ))
+    return client_id, client_secret
+
+
+def _authorize_and_get_code(client, *, client_id: str, redirect_uri: str):
+    """Drive the authorize endpoint; return (code, code_verifier)."""
+    verifier, challenge = _pkce_pair()
+    resp = client.post("/oauth/authorize", data={
+        "client_id": client_id, "redirect_uri": redirect_uri,
+        "response_type": "code", "scope": "memory:read", "state": "s",
+        "code_challenge": challenge, "code_challenge_method": "S256",
+        "password": "test-password", "decision": "allow",
+    }, follow_redirects=False)
+    code = urllib.parse.parse_qs(urllib.parse.urlparse(resp.headers["location"]).query)["code"][0]
+    return code, verifier
+
+
+def test_confidential_client_requires_secret_on_code_exchange(client):
+    """Codex finding #1: confidential clients cannot redeem a code without
+    presenting client_secret — even if PKCE is satisfied."""
+    redirect_uri = "https://confidential.example.com/cb"
+    cid, secret = _seed_confidential_client(redirect_uri)
+    code, verifier = _authorize_and_get_code(client, client_id=cid, redirect_uri=redirect_uri)
+
+    # Without secret → invalid_client
+    resp = client.post("/oauth/token", data={
+        "grant_type": "authorization_code", "code": code,
+        "client_id": cid, "redirect_uri": redirect_uri,
+        "code_verifier": verifier,
+    })
+    assert resp.status_code == 401
+    assert resp.json()["error"] == "invalid_client"
+
+    # Wrong secret → invalid_client (same response; don't leak validity signals).
+    # Use a *different* code since the first attempt consumed the one above.
+    code2, verifier2 = _authorize_and_get_code(client, client_id=cid, redirect_uri=redirect_uri)
+    resp = client.post("/oauth/token", data={
+        "grant_type": "authorization_code", "code": code2,
+        "client_id": cid, "redirect_uri": redirect_uri,
+        "code_verifier": verifier2, "client_secret": "wrong-secret",
+    })
+    assert resp.status_code == 401
+    assert resp.json()["error"] == "invalid_client"
+
+    # Correct secret → success.
+    code3, verifier3 = _authorize_and_get_code(client, client_id=cid, redirect_uri=redirect_uri)
+    resp = client.post("/oauth/token", data={
+        "grant_type": "authorization_code", "code": code3,
+        "client_id": cid, "redirect_uri": redirect_uri,
+        "code_verifier": verifier3, "client_secret": secret,
+    })
+    assert resp.status_code == 200
+    assert resp.json()["access_token"]
+
+
+def test_confidential_client_requires_secret_on_refresh(client):
+    """Codex finding #1 (refresh path): same rule applies to refresh_token grant."""
+    redirect_uri = "https://confidential.example.com/cb"
+    cid, secret = _seed_confidential_client(redirect_uri)
+    code, verifier = _authorize_and_get_code(client, client_id=cid, redirect_uri=redirect_uri)
+
+    # Get initial tokens with correct secret.
+    resp = client.post("/oauth/token", data={
+        "grant_type": "authorization_code", "code": code,
+        "client_id": cid, "redirect_uri": redirect_uri,
+        "code_verifier": verifier, "client_secret": secret,
+    })
+    assert resp.status_code == 200
+    refresh = resp.json()["refresh_token"]
+
+    # Refresh without secret → invalid_client.
+    resp = client.post("/oauth/token", data={
+        "grant_type": "refresh_token", "refresh_token": refresh, "client_id": cid,
+    })
+    assert resp.status_code == 401
+    assert resp.json()["error"] == "invalid_client"
+
+    # Refresh with correct secret → success. The prior refresh MUST still be
+    # valid — our fail path above must NOT have silently revoked it.
+    resp = client.post("/oauth/token", data={
+        "grant_type": "refresh_token", "refresh_token": refresh, "client_id": cid,
+        "client_secret": secret,
+    })
+    assert resp.status_code == 200, (
+        "refresh with correct secret must still work after a prior no-secret attempt"
+    )
+    assert resp.json()["access_token"]
+
+
+def test_unsupported_auth_method_rejected(client):
+    """A client record with an unrecognised token_endpoint_auth_method must
+    not silently fall through to 'public client' semantics."""
+    from galactica_mcp import oauth_storage
+    redirect_uri = "https://weird.example.com/cb"
+    oauth_storage.save_client(oauth_storage.OAuthClient(
+        client_id="weird-auth",
+        client_secret="anything",
+        client_name="Weird Auth Client",
+        redirect_uris=[redirect_uri],
+        grant_types=["authorization_code"],
+        response_types=["code"],
+        scope=["memory:read"],
+        token_endpoint_auth_method="client_secret_basic",  # not supported by us
+    ))
+    code, verifier = _authorize_and_get_code(client, client_id="weird-auth", redirect_uri=redirect_uri)
+    resp = client.post("/oauth/token", data={
+        "grant_type": "authorization_code", "code": code,
+        "client_id": "weird-auth", "redirect_uri": redirect_uri,
+        "code_verifier": verifier,
+    })
+    assert resp.status_code == 401
+    assert resp.json()["error"] == "invalid_client"
+
+
+def test_refresh_rejects_any_scope_outside_original_grant(client):
+    """Codex finding #2: RFC 6749 §6 — if ANY requested scope is outside the
+    original grant, return invalid_scope. Do not silently narrow."""
+    # Give the Claude-iOS-like client memory:read only. Then ask refresh to
+    # include memory:write (which was never in the original grant).
+    tokens_resp, client_id, _ = _full_oauth_flow(client, requested_scope="memory:read")
+    refresh = tokens_resp["refresh_token"]
+
+    resp = client.post("/oauth/token", data={
+        "grant_type": "refresh_token",
+        "refresh_token": refresh,
+        "client_id": client_id,
+        "scope": "memory:read memory:write",
+    })
+    assert resp.status_code == 400
+    assert resp.json()["error"] == "invalid_scope"
+    assert "memory:write" in resp.json()["error_description"]
+
+
 def test_elevated_scope_request_filtered(client):
     """Seeded Claude iOS client requests memory:write — server must downgrade
     to memory:read since that's the maximum allowed at registration."""

@@ -368,6 +368,44 @@ async def token(request: Request) -> JSONResponse:
                          f"grant_type '{grant_type}' is not supported")
 
 
+def _authenticate_client(
+    client: oauth_storage.OAuthClient, form: Any
+) -> JSONResponse | None:
+    """Verify client authentication at the token endpoint.
+
+    - Public clients (``token_endpoint_auth_method == "none"``) present no
+      secret; PKCE is the only binding.
+    - Confidential clients (``client_secret_post``) MUST present a
+      ``client_secret`` form field that matches the stored secret. Compared
+      with ``secrets.compare_digest`` to avoid timing oracles.
+
+    Returns None when authentication passes, or a JSONResponse error otherwise.
+    """
+    method = client.token_endpoint_auth_method
+    if method == "none":
+        return None
+    if method == "client_secret_post":
+        if client.client_secret is None:
+            # Misconfigured client record — treat as server error rather than
+            # silently accepting an unauthenticated call.
+            return _oauth_error(
+                "server_error",
+                "client is marked confidential but has no stored secret",
+                status=500,
+            )
+        presented = form.get("client_secret", "") or ""
+        if not secrets.compare_digest(presented, client.client_secret):
+            return _oauth_error(
+                "invalid_client", "client authentication failed", status=401
+            )
+        return None
+    return _oauth_error(
+        "invalid_client",
+        f"unsupported token_endpoint_auth_method: {method}",
+        status=401,
+    )
+
+
 def _grant_authorization_code(form: Any) -> JSONResponse:
     """Redeem an authorization code for access + refresh tokens."""
     code = form.get("code", "")
@@ -382,6 +420,10 @@ def _grant_authorization_code(form: Any) -> JSONResponse:
     client = oauth_storage.get_client(client_id)
     if client is None:
         return _oauth_error("invalid_client", "unknown client_id", status=401)
+
+    auth_error = _authenticate_client(client, form)
+    if auth_error is not None:
+        return auth_error
 
     auth_code = oauth_storage.consume_authorization_code(code)
     if auth_code is None:
@@ -413,6 +455,10 @@ def _grant_refresh_token(form: Any) -> JSONResponse:
     if client is None:
         return _oauth_error("invalid_client", "unknown client_id", status=401)
 
+    auth_error = _authenticate_client(client, form)
+    if auth_error is not None:
+        return auth_error
+
     record = oauth_storage.lookup_refresh_token(refresh_token_value)
     if record is None:
         return _oauth_error("invalid_grant", "refresh token is unknown, revoked, or expired")
@@ -422,11 +468,17 @@ def _grant_refresh_token(form: Any) -> JSONResponse:
     existing_scope = record["scope"]
     if requested_scope_str:
         requested = scopes.parse(requested_scope_str)
-        # RFC 6749 §6 — refresh scope MUST NOT exceed the original.
-        new_scope = scopes.validate_subset(requested, existing_scope)
-        if not new_scope:
-            return _oauth_error("invalid_scope",
-                                 "requested scope exceeds original grant")
+        # RFC 6749 §6 — refresh scope MUST NOT exceed the original. Any scope
+        # present in the request that is not in the original grant causes
+        # invalid_scope; we do NOT silently narrow.
+        existing_set = set(existing_scope)
+        outside = [s for s in requested if s not in existing_set]
+        if outside:
+            return _oauth_error(
+                "invalid_scope",
+                f"requested scope exceeds original grant: {' '.join(outside)}",
+            )
+        new_scope = requested
     else:
         new_scope = existing_scope
 
