@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.galactica</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/admin/universal-memory-system/venv_new/bin/python3</string>
+        <string>/Users/admin/universal-memory-system/src/api_service.py</string>
+        <string>--host</string>
+        <string>0.0.0.0</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PYTHONPATH</key>
+        <string>/Users/admin/universal-memory-system</string>
+        <key>HOME</key>
+        <string>/Users/admin</string>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+
+        <!-- Galactica 2.0 Phase 1 — MCP + OAuth 2.1 -->
+        <!-- RSA private key in PEM format. Generate once on M2 with:
+               openssl genrsa -out /Users/admin/.ai-memory/galactica_oauth.pem 2048
+             Then paste the full PEM (including BEGIN/END lines) between the
+             <string> tags below. DO NOT check the PEM into git. -->
+        <key>GALACTICA_OAUTH_PRIVATE_KEY</key>
+        <string>REPLACE_WITH_PEM_PRIVATE_KEY</string>
+
+        <!-- Password Clif types on /oauth/authorize to approve a grant. -->
+        <key>GALACTICA_AUTHORIZE_PASSWORD</key>
+        <string>REPLACE_WITH_STRONG_PASSPHRASE</string>
+
+        <!-- Issuer URL (also used to build .well-known + token aud claims). -->
+        <key>GALACTICA_ISSUER</key>
+        <string>https://galactica.barge2rail.com</string>
+    </dict>
+    <key>WorkingDirectory</key>
+    <string>/Users/admin/universal-memory-system</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+</dict>
+</plist>

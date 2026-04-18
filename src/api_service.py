@@ -84,6 +84,21 @@ if static_dir.exists():
 app.include_router(capture_router)
 app.include_router(graph_router)
 
+# Galactica 2.0 Phase 1 — native MCP endpoint + OAuth 2.1 authorization server.
+# Added via routers so the existing API surface is untouched.
+from galactica_mcp.oauth_router import router as _galactica_oauth_router
+from galactica_mcp.mcp_router import router as _galactica_mcp_router
+from galactica_mcp import audit as _galactica_audit, oauth_storage as _galactica_oauth_storage
+app.include_router(_galactica_oauth_router)
+app.include_router(_galactica_mcp_router)
+
+
+@app.on_event("startup")
+async def _galactica_phase1_startup() -> None:
+    """Initialize Phase 1 databases (audit + OAuth). Idempotent."""
+    _galactica_audit.init_db()
+    _galactica_oauth_storage.init_db()
+
 # Global memory service
 memory_service: Optional[UniversalMemoryService] = None
 

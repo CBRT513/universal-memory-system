@@ -35,6 +35,14 @@ lxml>=4.9.0
 httpx>=0.25.0
 sse-starlette>=1.6.0
 
+# Galactica 2.0 Phase 1 - MCP + OAuth 2.1
+# authlib: OAuth 2.1 framework (authorize/token/register/metadata).
+# joserfc: JWT RS256 signing/verification (authlib.jose is deprecated).
+# cryptography: RSA keypair loading for joserfc.
+authlib>=1.7.0,<2.0.0
+joserfc>=1.6.0,<2.0.0
+cryptography>=46.0.0
+
 # Development and testing (uncomment if needed)
 # pytest>=7.0.0
 # pytest-asyncio>=0.21.0
