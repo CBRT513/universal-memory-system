@@ -3,10 +3,13 @@
 Runbooks and configuration diffs for shipping Phase 1 (native MCP + OAuth 2.1)
 to the M2 Mac Mini.
 
-- **`plist-runbook.md`** — launchd plist update (deployment step 5)
-- **`com.galactica.plist.proposed`** — the new plist contents
-- **`cloudflare-policy.md`** — Zero Trust Access bypass setup (step 6)
-- **`seed-oauth-client.md`** — insert the Claude iOS OAuth client (after step 7)
+- **`DEPLOY.md`** — **consolidated top-to-bottom runbook** (single source of truth for executing the deployment)
+- **`com.galactica.plist.proposed`** — the new plist contents (reference)
+- **`plist-runbook.md`** — plist update in isolation (subsumed by DEPLOY.md step 6–8)
+- **`cloudflare-policy.md`** — CF bypass setup in isolation (subsumed by DEPLOY.md step 12)
+- **`seed-oauth-client.md`** — OAuth client seeding in isolation (subsumed by DEPLOY.md step 10)
+
+Execute from `DEPLOY.md`. The other files exist as references / rollback artifacts.
 
 ## Deployment sequence reminder (from original brief)
 
