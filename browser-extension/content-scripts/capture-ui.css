@@ -1,0 +1,588 @@
+/**
+ * Universal AI Memory Capture - UI Styling
+ * Modern, clean interface for AI response capture
+ */
+
+/* Floating capture button */
+#ai-memory-capture-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    
+    width: 56px;
+    height: 56px;
+    
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3), 
+                0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    cursor: pointer;
+    user-select: none;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+}
+
+#ai-memory-capture-btn.visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+#ai-memory-capture-btn:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4),
+                0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+#ai-memory-capture-btn:active {
+    transform: scale(0.95);
+}
+
+#ai-memory-capture-btn .capture-icon {
+    font-size: 20px;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+#ai-memory-capture-btn .capture-text {
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Capture modal */
+.ai-memory-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10001;
+    
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.ai-memory-modal.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.ai-memory-modal-content {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    
+    padding: 0;
+    overflow: hidden;
+    
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-memory-modal.visible .ai-memory-modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.ai-memory-modal-header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ai-memory-modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+    
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-memory-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.ai-memory-modal-close:hover {
+    background: #f5f5f5;
+    color: #333;
+}
+
+.ai-memory-modal-body {
+    padding: 16px 24px 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.ai-memory-preview {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.ai-memory-preview-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.ai-memory-preview-content {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    max-height: 150px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.ai-memory-form-group {
+    margin-bottom: 16px;
+}
+
+.ai-memory-form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.ai-memory-form-input,
+.ai-memory-form-select,
+.ai-memory-form-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #374151;
+    background: white;
+    
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.ai-memory-form-input:focus,
+.ai-memory-form-select:focus,
+.ai-memory-form-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.ai-memory-form-textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.ai-memory-tags-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    
+    min-height: 38px;
+    padding: 6px 10px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    
+    cursor: text;
+    transition: border-color 0.2s ease;
+}
+
+.ai-memory-tags-input:focus-within {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.ai-memory-tag {
+    background: #667eea;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ai-memory-tag-remove {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1;
+    
+    transition: color 0.2s ease;
+}
+
+.ai-memory-tag-remove:hover {
+    color: white;
+}
+
+.ai-memory-tags-input input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    flex: 1;
+    min-width: 60px;
+    padding: 2px 0;
+}
+
+.ai-memory-importance-slider {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #e5e7eb;
+    outline: none;
+    
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.ai-memory-importance-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    transition: all 0.2s ease;
+}
+
+.ai-memory-importance-slider::-webkit-slider-thumb:hover {
+    background: #5a67d8;
+    transform: scale(1.1);
+}
+
+.ai-memory-importance-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+}
+
+.ai-memory-importance-label {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.ai-memory-form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.ai-memory-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    
+    transition: all 0.2s ease;
+    
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.ai-memory-btn-primary {
+    background: #667eea;
+    color: white;
+    flex: 1;
+}
+
+.ai-memory-btn-primary:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.ai-memory-btn-primary:active {
+    transform: translateY(0);
+}
+
+.ai-memory-btn-primary:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.ai-memory-btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 10px 16px;
+}
+
+.ai-memory-btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+/* Platform-specific adjustments */
+.ai-platform-chatgpt .ai-memory-modal-content {
+    font-family: 'Söhne', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.ai-platform-claude .ai-memory-modal-content {
+    font-family: 'Haas Grot Text', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Toast notifications */
+.ai-memory-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10002;
+    
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    
+    padding: 16px 20px;
+    max-width: 350px;
+    
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    border-left: 4px solid #667eea;
+}
+
+.ai-memory-toast.visible {
+    transform: translateX(0);
+}
+
+.ai-memory-toast.success {
+    border-left-color: #10b981;
+}
+
+.ai-memory-toast.error {
+    border-left-color: #ef4444;
+}
+
+.ai-memory-toast-message {
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.4;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Response highlighting */
+.ai-memory-highlighted {
+    position: relative;
+    animation: ai-memory-highlight-pulse 2s ease-out;
+}
+
+.ai-memory-highlighted::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    pointer-events: none;
+    
+    animation: ai-memory-highlight-fade 2s ease-out forwards;
+}
+
+@keyframes ai-memory-highlight-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+}
+
+@keyframes ai-memory-highlight-fade {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #ai-memory-capture-btn {
+        width: 48px;
+        height: 48px;
+        top: 10px;
+        right: 10px;
+    }
+    
+    #ai-memory-capture-btn .capture-icon {
+        font-size: 18px;
+    }
+    
+    #ai-memory-capture-btn .capture-text {
+        font-size: 8px;
+    }
+    
+    .ai-memory-modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .ai-memory-modal-header,
+    .ai-memory-modal-body {
+        padding: 16px;
+    }
+    
+    .ai-memory-toast {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+    .ai-memory-modal-content {
+        background: #1f2937;
+        color: #f9fafb;
+    }
+    
+    .ai-memory-modal-header {
+        border-bottom-color: #374151;
+    }
+    
+    .ai-memory-modal-title {
+        color: #f9fafb;
+    }
+    
+    .ai-memory-modal-close {
+        color: #9ca3af;
+    }
+    
+    .ai-memory-modal-close:hover {
+        background: #374151;
+        color: #f3f4f6;
+    }
+    
+    .ai-memory-preview {
+        background: #111827;
+        border-color: #374151;
+    }
+    
+    .ai-memory-preview-content {
+        color: #e5e7eb;
+    }
+    
+    .ai-memory-form-label {
+        color: #f3f4f6;
+    }
+    
+    .ai-memory-form-input,
+    .ai-memory-form-select,
+    .ai-memory-form-textarea,
+    .ai-memory-tags-input {
+        background: #111827;
+        border-color: #374151;
+        color: #f9fafb;
+    }
+    
+    .ai-memory-form-input:focus,
+    .ai-memory-form-select:focus,
+    .ai-memory-form-textarea:focus,
+    .ai-memory-tags-input:focus-within {
+        border-color: #667eea;
+    }
+    
+    .ai-memory-toast {
+        background: #1f2937;
+        color: #f9fafb;
+    }
+}
+/* Article checkbox and subcategory styling */
+.ai-memory-article-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.ai-memory-checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.ai-memory-checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.ai-memory-checkbox-label span {
+    font-size: 15px;
+    color: #333;
+}
+
+.ai-memory-article-subcategory {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e1e4e8;
+}
+
+.ai-memory-article-subcategory .ai-memory-form-select {
+    background-color: white;
+    border-color: #667eea;
+}
+
+.ai-memory-article-subcategory .ai-memory-form-label {
+    color: #586069;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}

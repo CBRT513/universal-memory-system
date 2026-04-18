@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal AI Memory - Browser Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        
+        .bookmarklet-section {
+            text-align: center;
+            margin: 2rem 0 3rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 15px;
+            color: white;
+        }
+        
+        .bookmarklet {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 1rem;
+            cursor: move;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .bookmarklet:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .drag-instruction {
+            margin-top: 1rem;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .warning {
+            background: #fef5e7;
+            border: 1px solid #f6ad55;
+            color: #744210;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+        
+        .success {
+            background: #f0fff4;
+            border: 1px solid #68d391;
+            color: #22543d;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+        
+        .section {
+            margin: 3rem 0;
+        }
+        
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+        
+        .section h3 {
+            color: #4a5568;
+            margin: 1.5rem 0 1rem 0;
+            font-size: 1.3rem;
+        }
+        
+        .platforms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .platform-card {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .platform-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .platform-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .platform-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .platform-status {
+            font-size: 0.9rem;
+            color: #68d391;
+        }
+        
+        .steps {
+            counter-reset: step-counter;
+        }
+        
+        .step {
+            counter-increment: step-counter;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: #f7fafc;
+            border-radius: 10px;
+            position: relative;
+            padding-left: 4rem;
+        }
+        
+        .step::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 1rem;
+            top: 1.5rem;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+        
+        .feature-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .feature-content h4 {
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+        
+        .feature-content p {
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        
+        .status-check {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.5rem 0;
+        }
+        
+        .status-good { color: #38a169; }
+        .status-warning { color: #d69e2e; }
+        .status-error { color: #e53e3e; }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        button:hover {
+            background: #5a67d8;
+        }
+        
+        .demo-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .content {
+                padding: 2rem 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .platforms-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Universal AI Memory</h1>
+            <p>Browser Integration - Capture insights from any AI platform</p>
+        </div>
+        
+        <div class="content">
+            <div class="bookmarklet-section">
+                <h2 style="margin-bottom: 1rem;">🔖 Memory Capture Bookmarklet</h2>
+                <p>Drag this button to your browser's bookmark bar:</p>
+                
+                <a href="javascript:(function(){document.body.appendChild(document.createElement('script')).src='http://localhost:8091/static/browser_capture.js';})();" 
+                   class="bookmarklet">
+                   🧠 Capture AI Memory
+                </a>
+                
+                <div class="drag-instruction">
+                    <strong>📌 Drag the button above to your bookmark bar</strong><br>
+                    Then click it on any AI website to capture insights!
+                </div>
+            </div>
+            
+            <div class="warning">
+                <strong>⚠️ Setup Required:</strong> Make sure your Universal AI Memory service is running on localhost:8091 before using the bookmarklet.
+                <br><br>
+                <strong>Start the service:</strong> <code>./start-memory-service.sh</code>
+            </div>
+            
+            <div class="section">
+                <h2>🚀 How It Works</h2>
+                <div class="steps">
+                    <div class="step">
+                        <h3>Start Memory Service</h3>
+                        <p>Make sure your Universal AI Memory service is running locally.</p>
+                        <div class="code-block">./start-memory-service.sh</div>
+                    </div>
+                    
+                    <div class="step">
+                        <h3>Add Bookmarklet</h3>
+                        <p>Drag the "🧠 Capture AI Memory" button to your browser's bookmark bar.</p>
+                    </div>
+                    
+                    <div class="step">
+                        <h3>Use with Any AI</h3>
+                        <p>While chatting with any AI, click the bookmarklet to capture insights. It will auto-detect the platform and extract content intelligently.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🤖 Supported AI Platforms</h2>
+                <div class="platforms-grid">
+                    <div class="platform-card">
+                        <div class="platform-icon">💬</div>
+                        <div class="platform-name">ChatGPT</div>
+                        <div class="platform-status">✅ Fully Supported</div>
+                    </div>
+                    
+                    <div class="platform-card">
+                        <div class="platform-icon">🤖</div>
+                        <div class="platform-name">Claude</div>
+                        <div class="platform-status">✅ Fully Supported</div>
+                    </div>
+                    
+                    <div class="platform-card">
+                        <div class="platform-icon">🌟</div>
+                        <div class="platform-name">Google Bard</div>
+                        <div class="platform-status">✅ Fully Supported</div>
+                    </div>
+                    
+                    <div class="platform-card">
+                        <div class="platform-icon">🔍</div>
+                        <div class="platform-name">Bing Chat</div>
+                        <div class="platform-status">✅ Fully Supported</div>
+                    </div>
+                    
+                    <div class="platform-card">
+                        <div class="platform-icon">🧠</div>
+                        <div class="platform-name">Perplexity</div>
+                        <div class="platform-status">✅ Supported</div>
+                    </div>
+                    
+                    <div class="platform-card">
+                        <div class="platform-icon">🎭</div>
+                        <div class="platform-name">Character.AI</div>
+                        <div class="platform-status">✅ Supported</div>
+                    </div>
+                    
+                    <div class="platform-card">
+                        <div class="platform-icon">🔬</div>
+                        <div class="platform-name">Hugging Face</div>
+                        <div class="platform-status">✅ Supported</div>
+                    </div>
+                    
+                    <div class="platform-card">
+                        <div class="platform-icon">🌐</div>
+                        <div class="platform-name">Any Website</div>
+                        <div class="platform-status">✅ Manual Selection</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>✨ Smart Features</h2>
+                <div class="features-list">
+                    <div class="feature">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-content">
+                            <h4>Auto-Detection</h4>
+                            <p>Automatically detects AI platform and extracts relevant content from conversations.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">🏷️</div>
+                        <div class="feature-content">
+                            <h4>Smart Tagging</h4>
+                            <p>Automatically generates relevant tags based on content analysis and technical keywords.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-content">
+                            <h4>Auto-Categorization</h4>
+                            <p>Intelligently categorizes content as solutions, patterns, decisions, or insights.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">⭐</div>
+                        <div class="feature-content">
+                            <h4>Importance Scoring</h4>
+                            <p>Estimates importance based on content length, keywords, and AI platform quality.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">🔒</div>
+                        <div class="feature-content">
+                            <h4>Status Protection</h4>
+                            <p>Mark working systems as protected to prevent regression in future AI conversations.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-content">
+                            <h4>Quick Capture</h4>
+                            <p>Select text and get instant capture option, or use full interface for detailed annotation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h2>🎬 Usage Examples</h2>
+                
+                <h3>ChatGPT Example:</h3>
+                <p>1. Ask ChatGPT: "How do I optimize React performance?"</p>
+                <p>2. Get a detailed response with specific techniques</p>
+                <p>3. Click the bookmarklet</p>
+                <p>4. Content is auto-extracted, tagged with "react, performance, optimization"</p>
+                <p>5. Save with high importance for future reference</p>
+                
+                <h3>Claude Example:</h3>
+                <p>1. Discuss a database architecture decision with Claude</p>
+                <p>2. Claude provides pros/cons of different approaches</p>
+                <p>3. Select the key insight and click bookmarklet</p>
+                <p>4. Gets categorized as "decision" with "database, architecture" tags</p>
+                <p>5. Save with "working" status to protect from future changes</p>
+            </div>
+            
+            <div class="section">
+                <h2>🔧 System Status Check</h2>
+                <div class="status-check">
+                    <div class="status-item">
+                        <span>Memory Service Connection:</span>
+                        <span id="service-status" class="status-warning">Checking...</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Total Memories Stored:</span>
+                        <span id="memory-count" class="status-good">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Active Projects:</span>
+                        <span id="project-count" class="status-good">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Vector Search Available:</span>
+                        <span id="vector-status" class="status-good">-</span>
+                    </div>
+                </div>
+                
+                <button onclick="checkSystemStatus()">🔄 Refresh Status</button>
+                <button onclick="testBookmarklet()">🧪 Test Bookmarklet</button>
+            </div>
+            
+            <div class="section">
+                <h2>💡 Pro Tips</h2>
+                <ul style="line-height: 2;">
+                    <li><strong>Select before clicking:</strong> Select specific text for quick capture of key insights</li>
+                    <li><strong>Use status wisely:</strong> Mark stable solutions as "working" to protect them</li>
+                    <li><strong>Tag consistently:</strong> Use consistent tags to build searchable knowledge bases</li>
+                    <li><strong>Rate importance:</strong> High importance memories appear first in context generation</li>
+                    <li><strong>Capture failures:</strong> Remember what didn't work to avoid repeating mistakes</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2>🔗 Integration with CLI</h2>
+                <p>Memories captured through the browser are immediately available via CLI:</p>
+                
+                <div class="code-block">
+# Search memories captured from any AI platform
+memory search "React optimization" --source chatgpt
+
+# Get context including browser-captured memories
+memory context --relevant-to "database performance" --copy
+
+# View all memories from a specific AI platform
+memory search --tags claude --format markdown
+                </div>
+            </div>
+            
+            <div class="success">
+                <h3>🎉 You're All Set!</h3>
+                <p>Once your memory service is running and the bookmarklet is installed, you can capture insights from any AI platform. Your knowledge will persist across all AI conversations, preventing context loss and building institutional memory over time.</p>
+                
+                <p><strong>Next steps:</strong></p>
+                <ul style="margin-top: 1rem;">
+                    <li>Start capturing insights from your AI conversations</li>
+                    <li>Use <code>memory context</code> to get relevant background for new conversations</li>
+                    <li>Build up your personal AI knowledge base over time</li>
+                    <li>Never lose important solutions or insights again!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function checkSystemStatus() {
+            const serviceStatus = document.getElementById('service-status');
+            const memoryCount = document.getElementById('memory-count');
+            const projectCount = document.getElementById('project-count');
+            const vectorStatus = document.getElementById('vector-status');
+            
+            // Reset status
+            serviceStatus.textContent = 'Checking...';
+            serviceStatus.className = 'status-warning';
+            
+            try {
+                // Check if service is running
+                const response = await fetch('http://localhost:8091/api/stats');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const stats = data.stats.overall;
+                    
+                    serviceStatus.textContent = '✅ Connected';
+                    serviceStatus.className = 'status-good';
+                    
+                    memoryCount.textContent = stats.total_memories;
+                    projectCount.textContent = stats.total_projects;
+                    vectorStatus.textContent = stats.vector_search_enabled ? '✅ Enabled' : '⚠️ Disabled';
+                    vectorStatus.className = stats.vector_search_enabled ? 'status-good' : 'status-warning';
+                    
+                } else {
+                    throw new Error('Service responded with error');
+                }
+                
+            } catch (error) {
+                serviceStatus.textContent = '❌ Not Running';
+                serviceStatus.className = 'status-error';
+                
+                memoryCount.textContent = 'N/A';
+                projectCount.textContent = 'N/A';
+                vectorStatus.textContent = 'N/A';
+            }
+        }
+        
+        function testBookmarklet() {
+            // Create some test content
+            const testContent = "This is a test memory capture from the browser integration page. It demonstrates how the bookmarklet works with sample content that includes keywords like React, performance, and optimization.";
+            
+            // Create a temporary div with the test content
+            const testDiv = document.createElement('div');
+            testDiv.textContent = testContent;
+            testDiv.style.position = 'absolute';
+            testDiv.style.left = '-9999px';
+            document.body.appendChild(testDiv);
+            
+            // Select the test content
+            const range = document.createRange();
+            range.selectNodeContents(testDiv);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            // Load and execute the bookmarklet
+            const script = document.createElement('script');
+            script.src = 'http://localhost:8091/static/browser_capture.js';
+            script.onload = () => {
+                // Clean up
+                document.body.removeChild(testDiv);
+                selection.removeAllRanges();
+            };
+            script.onerror = () => {
+                alert('❌ Failed to load bookmarklet script. Make sure the memory service is running on localhost:8091');
+                document.body.removeChild(testDiv);
+                selection.removeAllRanges();
+            };
+            
+            document.body.appendChild(script);
+        }
+        
+        // Check status on page load
+        window.addEventListener('DOMContentLoaded', checkSystemStatus);
+        
+        // Auto-refresh status every 30 seconds
+        setInterval(checkSystemStatus, 30000);
+    </script>
+</body>
+</html>

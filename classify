@@ -1,0 +1,46 @@
+#!/usr/local/share/universal-memory-system/venv/bin/python3
+"""
+Quick Content Classifier - Classify content from clipboard or input
+"""
+
+import subprocess
+import sys
+from src.manual_classifier import get_user_classification, store_with_classification
+
+def get_clipboard():
+    """Get content from macOS clipboard"""
+    try:
+        result = subprocess.run(['pbpaste'], capture_output=True, text=True)
+        return result.stdout.strip()
+    except:
+        return None
+
+def main():
+    # Get content from clipboard or argument
+    if len(sys.argv) > 1:
+        content = ' '.join(sys.argv[1:])
+    else:
+        content = get_clipboard()
+        
+    if not content:
+        print("❌ No content found. Copy something to clipboard or provide as argument.")
+        sys.exit(1)
+    
+    print(f"📋 Content from clipboard: {content[:200]}{'...' if len(content) > 200 else ''}")
+    print("=" * 60)
+    
+    # Get classification from user
+    classification = get_user_classification()
+    
+    # Store with classification
+    result = store_with_classification(content, classification)
+    
+    if result:
+        print(f"\n🎉 Successfully classified and stored!")
+        if classification['type'] == 'article':
+            print(f"📰 Tagged as: ACTUAL ARTICLE")
+        else:
+            print(f"📝 Tagged as: {classification['type'].upper()}")
+
+if __name__ == "__main__":
+    main()

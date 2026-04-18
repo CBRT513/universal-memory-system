@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMS Capture Bookmarklet</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        h1 {
+            color: #4fc3f7;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .bookmarklet-container {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .bookmarklet-link {
+            display: inline-block;
+            background: #4fc3f7;
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        .bookmarklet-link:hover {
+            background: #29b6f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 195, 247, 0.3);
+        }
+        .instructions {
+            background: #2a2a2a;
+            border-left: 4px solid #4fc3f7;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .instructions h2 {
+            color: #4fc3f7;
+            margin-top: 0;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        .code-block {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            color: #81c784;
+        }
+        .warning {
+            background: #3e2723;
+            border: 1px solid #6d4c41;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #ffab91;
+        }
+        .status {
+            background: #1b5e20;
+            border: 1px solid #2e7d32;
+            border-radius: 4px;
+            padding: 10px 15px;
+            margin: 20px 0;
+            color: #a5d6a7;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔖 UMS Capture Bookmarklet</h1>
+    
+    <div class="status">
+        <strong>Status:</strong> UMS API must be running on http://localhost:8091
+    </div>
+
+    <div class="bookmarklet-container">
+        <h2>Drag this button to your bookmarks bar:</h2>
+        <p>
+            <a class="bookmarklet-link" href="javascript:(async()=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@mozilla/readability@0.5.0/Readability.js';document.head.appendChild(s);await new Promise(r=>s.onload=r);const doc=new DOMParser().parseFromString(document.documentElement.outerHTML,'text/html');const art=new Readability(doc).parse();if(!art){alert('Could not extract article content');return;}const payload={url:location.href,title:art.title||document.title,text:art.textContent||document.body.innerText,project:'vader-lab'};try{const resp=await fetch('http://localhost:8091/api/capture/from_client',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(resp.ok){const data=await resp.json();alert(`✅ Captured to UMS!\nJob ID: ${data.job_id}`);}else{alert(`❌ Capture failed: ${resp.status} ${resp.statusText}`);}}catch(e){alert(`❌ Error: ${e.message}\n\nMake sure UMS is running on http://localhost:8091`);}})();">
+                📄 Capture to UMS
+            </a>
+        </p>
+    </div>
+
+    <div class="instructions">
+        <h2>How to Install</h2>
+        <ol>
+            <li>Make sure your bookmarks bar is visible (Ctrl+Shift+B on Windows/Linux, Cmd+Shift+B on Mac)</li>
+            <li>Drag the blue "📄 Capture to UMS" button above to your bookmarks bar</li>
+            <li>That's it! The bookmarklet is now installed</li>
+        </ol>
+    </div>
+
+    <div class="instructions">
+        <h2>How to Use</h2>
+        <ol>
+            <li>Navigate to any article or webpage you want to capture</li>
+            <li>Click the "📄 Capture to UMS" bookmarklet in your bookmarks bar</li>
+            <li>Wait for the success message (usually 1-3 seconds)</li>
+            <li>The article is now saved in your UMS database!</li>
+        </ol>
+    </div>
+
+    <div class="instructions">
+        <h2>When to Use This</h2>
+        <p>Use the bookmarklet when:</p>
+        <ul>
+            <li>✅ The site blocks automated capture (paywalls, bot protection)</li>
+            <li>✅ You're already reading an article and want to save it</li>
+            <li>✅ The normal capture returns a 403 Forbidden or 401 Unauthorized</li>
+            <li>✅ You want to capture content that requires login</li>
+        </ul>
+    </div>
+
+    <div class="warning">
+        <h3>⚠️ Requirements</h3>
+        <ul>
+            <li>UMS API must be running on <code>http://localhost:8091</code></li>
+            <li>CORS must be enabled in the API (already configured)</li>
+            <li>The bookmarklet works best on article-style pages</li>
+            <li>Some sites with strict CSP policies may block the bookmarklet</li>
+        </ul>
+    </div>
+
+    <div class="code-block">
+        <h3>Bookmarklet Source Code (for reference):</h3>
+        <pre>(async () => {
+    // Load Readability library
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@mozilla/readability@0.5.0/Readability.js';
+    document.head.appendChild(script);
+    await new Promise(resolve => script.onload = resolve);
+    
+    // Parse the page
+    const documentClone = new DOMParser().parseFromString(
+        document.documentElement.outerHTML, 
+        'text/html'
+    );
+    const article = new Readability(documentClone).parse();
+    
+    if (!article) {
+        alert('Could not extract article content');
+        return;
+    }
+    
+    // Prepare payload
+    const payload = {
+        url: location.href,
+        title: article.title || document.title,
+        text: article.textContent || document.body.innerText,
+        project: 'vader-lab'
+    };
+    
+    // Send to UMS
+    try {
+        const response = await fetch('http://localhost:8091/api/capture/from_client', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            alert(`✅ Captured to UMS!\nJob ID: ${data.job_id}`);
+        } else {
+            alert(`❌ Capture failed: ${response.status} ${response.statusText}`);
+        }
+    } catch (error) {
+        alert(`❌ Error: ${error.message}\n\nMake sure UMS is running on http://localhost:8091`);
+    }
+})();</pre>
+    </div>
+
+    <div class="instructions">
+        <h2>Alternative: Manual Installation</h2>
+        <p>If drag-and-drop doesn't work:</p>
+        <ol>
+            <li>Right-click your bookmarks bar and select "Add page" or "Add bookmark"</li>
+            <li>Name it: <code>📄 Capture to UMS</code></li>
+            <li>For the URL, copy the entire code from the code block above (starting with <code>javascript:</code>)</li>
+            <li>Save the bookmark</li>
+        </ol>
+    </div>
+
+    <div class="status">
+        <strong>Test it:</strong> Try capturing this page itself by clicking the bookmarklet!
+    </div>
+</body>
+</html>

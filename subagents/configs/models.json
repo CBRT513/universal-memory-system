@@ -1,0 +1,41 @@
+{
+  "models": {
+    "sonnet": {
+      "name": "claude-3-5-sonnet-latest",
+      "description": "Best for complex coding tasks, architecture design, and detailed implementations",
+      "max_tokens": 8192,
+      "temperature": 0.2,
+      "recommended_for": ["backend", "frontend", "api", "devops", "security", "architecture"]
+    },
+    "haiku": {
+      "name": "claude-3-5-haiku-latest",
+      "description": "Fast and efficient for simpler tasks, code reviews, and documentation",
+      "max_tokens": 4096,
+      "temperature": 0.3,
+      "recommended_for": ["code-review", "documentation", "testing", "simple-tasks"]
+    },
+    "opus": {
+      "name": "claude-3-opus-latest",
+      "description": "Most capable model for complex reasoning and creative solutions",
+      "max_tokens": 4096,
+      "temperature": 0.1,
+      "recommended_for": ["ml-engineering", "architecture", "complex-debugging", "system-design"]
+    },
+    "local": {
+      "name": "llama3.2:3b",
+      "description": "Local Ollama model for privacy-sensitive tasks and offline work",
+      "max_tokens": 2048,
+      "temperature": 0.4,
+      "recommended_for": ["documentation", "simple-tasks", "offline-work"],
+      "api_base": "http://localhost:11434"
+    }
+  },
+  "default_model": "sonnet",
+  "fallback_model": "haiku",
+  "model_selection_strategy": "auto",
+  "cost_optimization": {
+    "enabled": true,
+    "prefer_cheaper_models": true,
+    "complexity_threshold": 0.7
+  }
+}

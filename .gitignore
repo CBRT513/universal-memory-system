@@ -1,0 +1,112 @@
+# ==========================================================
+# Galactica (universal-memory-system) — .gitignore
+# Baseline for Phase 1 MCP+OAuth work
+# ==========================================================
+
+# ---- Python virtual environments -------------------------
+venv/
+venv_new/
+venv.bak.*/
+.venv/
+env/
+ENV/
+
+# ---- Python build / cache artifacts ----------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+pip-wheel-metadata/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# ---- Databases (ALL .db files + SQLite side files) -------
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.db.bak
+*.db.bak.*
+
+# ---- Logs ------------------------------------------------
+logs/
+*.log
+*.log.*
+
+# ---- Secrets / environment -------------------------------
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+credentials.json
+service-account*.json
+
+# ---- Cloudflared credentials -----------------------------
+.cloudflared/
+cloudflared-creds*.json
+*-cloudflared.json
+*.tunnel.json
+
+# ---- macOS OS artifacts ----------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# ---- macOS app bundles (build output, not source) --------
+*.app/
+
+# ---- Shared data (runtime scratch) -----------------------
+shared_data/
+
+# ---- Auto-generated workspace artifacts ------------------
+.um-manifest.json
+.um-report.md
+
+# ---- Process / runtime files -----------------------------
+*.pid
+*.lock
+!poetry.lock
+!package-lock.json
+
+# ---- Editor / IDE ----------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.history/
+
+# ---- Claude Code user-local settings ---------------------
+.claude/settings.local.json
+
+# ---- Backups created by ad-hoc scripts -------------------
+*.backup
+*.backup.*
+*.bak
+*.bak.*
+*.orig
+
+# ---- Node.js --------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/

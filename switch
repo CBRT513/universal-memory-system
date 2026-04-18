@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Universal Memory System - Quick Workspace Switch
+# Just type 'switch' to toggle between personal and work
+
+CURRENT_FILE="$HOME/.ums-current-workspace"
+
+# Get current workspace
+if [ -f "$CURRENT_FILE" ]; then
+    CURRENT=$(cat "$CURRENT_FILE")
+else
+    CURRENT="personal"
+fi
+
+# Toggle workspace
+if [ "$CURRENT" = "personal" ]; then
+    NEW="work"
+    COLOR="\033[0;33m"  # Yellow for work
+    EMOJI="💼"
+else
+    NEW="personal"
+    COLOR="\033[0;36m"  # Cyan for personal
+    EMOJI="🏠"
+fi
+
+# Save new workspace
+echo "$NEW" > "$CURRENT_FILE"
+
+# Set for current shell
+export UMS_WORKSPACE="$NEW"
+
+# Update shell prompt (optional but helpful visual indicator)
+echo -e "${COLOR}Switched to $EMOJI  $NEW workspace\033[0m"
+
+# Show quick status
+if [ "$NEW" = "work" ]; then
+    echo "Port: 8092 | Database: work_memories.db"
+else
+    echo "Port: 8091 | Database: personal_memories.db"
+fi
+
+# If there's an argument, run a command in the new workspace
+if [ -n "$1" ]; then
+    shift
+    exec "$@"
+fi

@@ -1,0 +1,24 @@
+#!/bin/bash
+# Pre-commit hook for Claude Code SubAgent code review
+
+echo "Running automated code review..."
+
+# Get list of staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(py|js|ts|jsx|tsx)$')
+
+if [ -z "$STAGED_FILES" ]; then
+    echo "No code files to review"
+    exit 0
+fi
+
+# Run code review subagent
+python3 subagents/cli/subagent_cli.py execute code-reviewer "Review staged files: $STAGED_FILES"
+
+# Check if review passed
+if [ $? -ne 0 ]; then
+    echo "Code review failed. Please address the issues before committing."
+    exit 1
+fi
+
+echo "Code review passed!"
+exit 0

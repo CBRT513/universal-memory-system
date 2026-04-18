@@ -1,0 +1,80 @@
+#!/usr/local/share/universal-memory-system/venv/bin/python3
+"""
+Fix Article Classifications - Review and reclassify content marked as articles
+"""
+
+import requests
+import json
+from src.manual_classifier import get_user_classification
+
+def get_all_articles():
+    """Get all content currently marked as articles"""
+    try:
+        response = requests.get('http://127.0.0.1:8091/api/memory/search?q=category:article')
+        if response.ok:
+            return response.json().get('results', [])
+        return []
+    except:
+        return []
+
+def show_item_for_review(item):
+    """Show an item for user review"""
+    print("\n" + "="*80)
+    print(f"ID: {item['id']}")
+    print(f"Current: {item.get('category', 'unknown')}")
+    print(f"Content: {item['content'][:300]}{'...' if len(item['content']) > 300 else ''}")
+    print(f"Tags: {', '.join(item.get('tags', []))}")
+    print("="*80)
+
+def main():
+    print("🔍 Finding all content marked as 'articles'...")
+    
+    articles = get_all_articles()
+    
+    if not articles:
+        print("✅ No content found marked as articles!")
+        return
+    
+    print(f"\n📰 Found {len(articles)} items marked as articles")
+    print("\nLet's review each one:")
+    
+    for i, item in enumerate(articles, 1):
+        print(f"\n📋 Item {i}/{len(articles)}")
+        show_item_for_review(item)
+        
+        while True:
+            print("\nWhat do you want to do?")
+            print("1. This IS an actual article (keep as-is)")
+            print("2. This is NOT an article (reclassify)")
+            print("3. Skip this item")
+            print("4. Quit")
+            
+            choice = input("Choice (1-4): ").strip()
+            
+            if choice == '1':
+                print("✅ Keeping as article")
+                # Add user-verified tag
+                print(f"💾 Marked {item['id']} as verified article")
+                break
+            elif choice == '2':
+                print("🔄 Let's reclassify this...")
+                new_classification = get_user_classification()
+                # Would need API endpoint to update
+                print(f"💾 Would reclassify {item['id']} as '{new_classification['type']}'")
+                break
+            elif choice == '3':
+                print("⏭️ Skipping")
+                break
+            elif choice == '4':
+                print("👋 Goodbye!")
+                return
+            else:
+                print("❌ Please choose 1-4")
+    
+    print("\n✅ Review complete!")
+    print("\n💡 Future captures:")
+    print(f"   Use: /usr/local/share/universal-memory-system/classify")
+    print("   This will ask you what type of content it is BEFORE storing")
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal AI Memory Capture</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="popup-container">
+        <!-- Header -->
+        <div class="popup-header">
+            <div class="popup-logo">
+                <div class="logo-icon">🧠</div>
+                <div class="logo-text">
+                    <div class="logo-title">AI Memory</div>
+                    <div class="logo-subtitle">Capture</div>
+                </div>
+            </div>
+            <div class="popup-version">v1.0.0</div>
+        </div>
+
+        <!-- Status Section -->
+        <div class="popup-section">
+            <div class="status-container" id="status-container">
+                <div class="status-indicator" id="status-indicator">
+                    <div class="status-dot"></div>
+                    <span class="status-text">Checking connection...</span>
+                </div>
+                <div class="status-details" id="status-details">
+                    <!-- Connection details will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="popup-section">
+            <div class="section-title">Quick Actions</div>
+            <div class="actions-grid">
+                <button class="action-btn" id="capture-selection" disabled>
+                    <div class="action-icon">✂️</div>
+                    <div class="action-text">Capture Selection</div>
+                </button>
+                <button class="action-btn" id="capture-page">
+                    <div class="action-icon">📄</div>
+                    <div class="action-text">Capture Page</div>
+                </button>
+                <button class="action-btn" id="quick-note">
+                    <div class="action-icon">📝</div>
+                    <div class="action-text">Quick Note</div>
+                </button>
+                <button class="action-btn" id="search-memories">
+                    <div class="action-icon">🔍</div>
+                    <div class="action-text">Search</div>
+                </button>
+                <button class="action-btn" id="copy-ai-context">
+                    <div class="action-icon">🤖</div>
+                    <div class="action-text">Copy AI Context</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Current Platform -->
+        <div class="popup-section">
+            <div class="section-title">Current Platform</div>
+            <div class="platform-info" id="platform-info">
+                <div class="platform-icon" id="platform-icon">🤖</div>
+                <div class="platform-details">
+                    <div class="platform-name" id="platform-name">Unknown Platform</div>
+                    <div class="platform-url" id="platform-url">Not detected</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="popup-section">
+            <div class="section-title">Memory System</div>
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-memories">--</div>
+                    <div class="stat-label">Memories</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="total-projects">--</div>
+                    <div class="stat-label">Projects</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="recent-captures">--</div>
+                    <div class="stat-label">Today</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="popup-section">
+            <div class="section-title">Settings</div>
+            <div class="settings-list">
+                <div class="setting-item">
+                    <label class="setting-label">
+                        <input type="checkbox" id="auto-detect" checked>
+                        <span class="setting-text">Auto-detect valuable responses</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label class="setting-label">
+                        <input type="checkbox" id="show-notifications" checked>
+                        <span class="setting-text">Show capture notifications</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label class="setting-label">
+                        <input type="checkbox" id="smart-tagging" checked>
+                        <span class="setting-text">Smart auto-tagging</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="popup-footer">
+            <div class="footer-links">
+                <button class="footer-link" id="open-dashboard">Dashboard</button>
+                <button class="footer-link" id="view-help">Help</button>
+                <button class="footer-link" id="open-settings">Settings</button>
+            </div>
+            <div class="footer-shortcut">
+                <span>Quick capture: <kbd>Ctrl+M</kbd></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Note Modal -->
+    <div class="modal-overlay" id="quick-note-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Quick Note</h3>
+                <button class="modal-close" id="quick-note-close">×</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="quick-note-text" placeholder="What would you like to remember?" rows="4"></textarea>
+                <div class="modal-form-group">
+                    <label for="quick-note-tags">Tags (optional):</label>
+                    <input type="text" id="quick-note-tags" placeholder="tag1, tag2, tag3">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="quick-note-cancel">Cancel</button>
+                <button class="btn btn-primary" id="quick-note-save">Save Memory</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+#!/usr/bin/env python3
+"""
+Universal Memory System - Unified Interface
+Automatically uses the correct workspace for all operations
+"""
+
+import sys
+import os
+import subprocess
+from pathlib import Path
+
+# Add UMS to path
+sys.path.insert(0, '/usr/local/share/universal-memory-system')
+
+from workspace_manager import manager
+
+def main():
+    # Set up workspace environment
+    manager.set_environment()
+    
+    if len(sys.argv) < 2:
+        print_help()
+        return
+    
+    command = sys.argv[1]
+    args = sys.argv[2:] if len(sys.argv) > 2 else []
+    
+    # Handle workspace commands
+    if command == 'workspace':
+        if args and args[0] == 'switch':
+            if len(args) > 1:
+                manager.switch_workspace(args[1])
+            else:
+                print("Usage: ums workspace switch [personal|work]")
+        else:
+            manager.status()
+        return
+    
+    # Handle start/stop commands
+    if command == 'start':
+        start_api()
+        return
+    elif command == 'stop':
+        stop_api()
+        return
+    elif command == 'status':
+        show_status()
+        return
+    
+    # Route to appropriate tool
+    if command == 'memory' or command == 'mem':
+        run_memory_cli(args)
+    elif command == 'subagent' or command == 'agent':
+        run_subagent(args)
+    elif command == 'capture':
+        run_capture(args)
+    elif command == 'search':
+        run_search(args)
+    elif command == 'store':
+        run_store(args)
+    elif command == 'context':
+        run_context(args)
+    else:
+        print(f"Unknown command: {command}")
+        print_help()
+
+def print_help():
+    workspace = manager.workspace
+    print(f"""
+Universal Memory System - Unified Interface
+Current Workspace: {workspace}
+
+Commands:
+  ums start              - Start the memory API for current workspace
+  ums stop               - Stop the memory API
+  ums status             - Show system status
+  ums workspace          - Show current workspace
+  ums workspace switch [personal|work] - Switch workspace for this directory
+  
+  ums memory [args]      - Memory CLI commands
+  ums search <query>     - Search memories
+  ums store <content>    - Store a quick memory
+  ums context            - Generate AI context
+  
+  ums subagent list      - List available subagents
+  ums subagent create <name> - Create a subagent
+  ums subagent run <name> <task> - Run a subagent
+  
+  ums capture            - Open capture dialog (macOS)
+
+Shortcuts:
+  ums mem list           - List recent memories
+  ums agent list         - List subagents
+  
+Current workspace: {workspace}
+API Port: {os.environ.get('MEMORY_API_PORT', 'not set')}
+""")
+
+def start_api():
+    """Start the API for current workspace"""
+    workspace = manager.workspace
+    config = manager.get_config()
+    port = config['api_port']
+    
+    print(f"Starting {workspace} workspace API on port {port}...")
+    
+    workspace_dir = Path.home() / f'.ums-{workspace}'
+    start_script = workspace_dir / 'start.sh'
+    
+    if start_script.exists():
+        # Run in background
+        subprocess.Popen(
+            [str(start_script)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True
+        )
+        print(f"✓ Started {workspace} API on port {port}")
+        print(f"  View at: http://localhost:{port}/dashboard")
+    else:
+        print(f"Error: Start script not found. Run setup_workspace.sh first.")
+
+def stop_api():
+    """Stop the API for current workspace"""
+    config = manager.get_config()
+    port = config['api_port']
+    
+    # Find and kill process on port
+    result = subprocess.run(
+        f"lsof -ti:{port} | xargs kill -9",
+        shell=True,
+        capture_output=True
+    )
+    
+    if result.returncode == 0:
+        print(f"✓ Stopped API on port {port}")
+    else:
+        print(f"No API running on port {port}")
+
+def show_status():
+    """Show comprehensive status"""
+    manager.status()
+    
+    # Also show memory stats if API is running
+    config = manager.get_config()
+    port = config['api_port']
+    
+    try:
+        import requests
+        response = requests.get(f"http://localhost:{port}/api/stats", timeout=1)
+        if response.status_code == 200:
+            stats = response.json()
+            print(f"\nMemory Statistics:")
+            print(f"  Total memories: {stats.get('total_memories', 0)}")
+            print(f"  Categories: {', '.join(stats.get('categories', []))}")
+    except:
+        pass
+
+def run_memory_cli(args):
+    """Run memory CLI with workspace context"""
+    manager.set_environment()
+    
+    cmd = [
+        sys.executable,
+        '/usr/local/share/universal-memory-system/src/memory_cli.py'
+    ] + args
+    
+    subprocess.run(cmd)
+
+def run_subagent(args):
+    """Run subagent commands"""
+    if not args:
+        args = ['list']
+    
+    cmd = [
+        sys.executable,
+        '/usr/local/share/universal-memory-system/subagents/cli/subagent_cli.py'
+    ] + args
+    
+    subprocess.run(cmd)
+
+def run_search(args):
+    """Quick search"""
+    query = ' '.join(args)
+    run_memory_cli(['search', query])
+
+def run_store(args):
+    """Quick store"""
+    content = ' '.join(args)
+    run_memory_cli(['store', content, '--category', 'quick_capture'])
+
+def run_context(args):
+    """Generate AI context"""
+    cmd = [
+        sys.executable,
+        '/usr/local/share/universal-memory-system/src/ai_context_generator.py',
+        '--copy'
+    ]
+    subprocess.run(cmd)
+
+def run_capture(args):
+    """Open capture dialog"""
+    # This would integrate with Global Capture
+    print("Opening capture dialog...")
+    # TODO: Implement based on platform
+
+if __name__ == "__main__":
+    main()

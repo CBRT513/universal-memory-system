@@ -1,0 +1,61 @@
+{
+  "performance": {
+    "parallel_execution": {
+      "enabled": true,
+      "max_concurrent_agents": 5,
+      "queue_size": 100
+    },
+    "caching": {
+      "enabled": true,
+      "ttl_seconds": 3600,
+      "max_cache_size_mb": 500,
+      "cache_strategy": "lru"
+    },
+    "timeout_settings": {
+      "default_timeout_seconds": 120,
+      "max_timeout_seconds": 600,
+      "retry_attempts": 3,
+      "retry_delay_seconds": 5
+    },
+    "resource_limits": {
+      "max_memory_mb": 2048,
+      "max_cpu_percent": 80,
+      "max_tokens_per_request": 8192,
+      "rate_limit_requests_per_minute": 60
+    },
+    "optimization": {
+      "lazy_loading": true,
+      "stream_responses": true,
+      "batch_processing": true,
+      "compression": true
+    },
+    "monitoring": {
+      "enabled": true,
+      "metrics_interval_seconds": 60,
+      "log_level": "info",
+      "track_performance": true,
+      "track_costs": true
+    }
+  },
+  "accessibility": {
+    "response_format": "markdown",
+    "include_code_highlights": true,
+    "max_response_length": 10000,
+    "simplify_technical_terms": false,
+    "include_examples": true
+  },
+  "integration": {
+    "memory_system": {
+      "enabled": true,
+      "auto_save_patterns": true,
+      "auto_retrieve_context": true,
+      "max_context_memories": 10
+    },
+    "version_control": {
+      "enabled": true,
+      "auto_commit": false,
+      "branch_prefix": "subagent/",
+      "commit_message_template": "feat(subagent): {agent_name} - {task_description}"
+    }
+  }
+}

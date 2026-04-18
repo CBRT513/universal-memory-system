@@ -1,0 +1,47 @@
+# Universal AI Memory System - Python Dependencies
+# Core dependencies for production deployment
+
+# Web framework and API
+fastapi>=0.100.0
+uvicorn[standard]>=0.20.0
+jinja2>=3.1.0
+python-multipart>=0.0.6
+
+# CLI and user interface
+click>=8.1.0
+rich>=13.0.0
+
+# Data processing and storage
+numpy>=1.24.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# Vector search and embeddings (optional but recommended)
+sentence-transformers>=2.2.0
+hnswlib>=0.8.0
+
+# LangChain for action extraction and auto-implementation
+langchain>=0.3.0
+langchain-community>=0.3.0
+
+# Utility packages
+pyperclip>=1.8.0
+sqlite-fts4
+
+# Article capture and extraction
+readability-lxml>=0.8.1
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+httpx>=0.25.0
+sse-starlette>=1.6.0
+
+# Development and testing (uncomment if needed)
+# pytest>=7.0.0
+# pytest-asyncio>=0.21.0
+# black>=23.0.0
+# flake8>=6.0.0
+
+# Alternative embedding providers (uncomment as needed)
+# openai>=1.0.0  # For OpenAI embeddings
+# cohere>=4.0.0  # For Cohere embeddings
+# transformers>=4.30.0  # For Hugging Face models

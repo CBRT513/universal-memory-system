@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "Universal AI Memory Capture",
+  "version": "1.0.0",
+  "description": "Seamlessly capture AI insights from any platform directly to your Universal Memory System",
+  
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  
+  "host_permissions": [
+    "https://chat.openai.com/*",
+    "https://claude.ai/*", 
+    "https://www.perplexity.ai/*",
+    "https://bard.google.com/*",
+    "https://www.bing.com/*",
+    "https://huggingface.co/*",
+    "http://localhost:8091/*",
+    "http://127.0.0.1:8091/*"
+  ],
+  
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Universal AI Memory Capture"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://www.perplexity.ai/*",
+        "https://bard.google.com/*",
+        "https://www.bing.com/*",
+        "https://huggingface.co/*"
+      ],
+      "js": [
+        "content-scripts/ai-monitor.js",
+        "content-scripts/capture-interface.js"
+      ],
+      "css": [
+        "content-scripts/capture-ui.css"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "popup/*"
+      ],
+      "matches": [
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://www.perplexity.ai/*",
+        "https://bard.google.com/*", 
+        "https://www.bing.com/*",
+        "https://huggingface.co/*"
+      ]
+    }
+  ]
+}
