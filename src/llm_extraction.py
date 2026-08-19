@@ -102,7 +102,7 @@ def _extract_with_anthropic(text: str, context: Optional[Dict] = None) -> Dict[s
         prompt = _build_extraction_prompt(text, context)
         
         # Call API
-        model = os.environ.get("LLM_MODEL", "claude-3-haiku-20240307")
+        model = os.environ.get("LLM_MODEL", "claude-haiku-4-5-20251001")
         max_tokens = int(os.environ.get("LLM_MAX_TOKENS", "1000"))
         temperature = float(os.environ.get("LLM_TEMPERATURE", "0.1"))
         

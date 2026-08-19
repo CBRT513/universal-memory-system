@@ -17,7 +17,7 @@ The system supports LLM-augmented entity extraction using either Anthropic Claud
 **Note**: If both keys are present, Anthropic is preferred.
 
 ### LLM Configuration
-- `LLM_MODEL`: Model to use (defaults: `claude-3-haiku-20240307` for Anthropic, `gpt-3.5-turbo` for OpenAI)
+- `LLM_MODEL`: Model to use (defaults: `claude-haiku-4-5-20251001` for Anthropic, `gpt-3.5-turbo` for OpenAI)
 - `LLM_MAX_TOKENS`: Maximum tokens for response (default: `1000`)
 - `LLM_TEMPERATURE`: Temperature for generation (default: `0.1` for consistency)
 - `LLM_MIN_CONFIDENCE`: Minimum confidence threshold for LLM entities (default: `0.2`)
@@ -47,7 +47,7 @@ export LLM_EXTRACT_ON_CAPTURE="true"  # Auto-extract on captures
 # Create .env in project root
 cat > /usr/local/share/universal-memory-system/.env << EOF
 ANTHROPIC_API_KEY=sk-ant-...
-LLM_MODEL=claude-3-haiku-20240307
+LLM_MODEL=claude-haiku-4-5-20251001
 LLM_MIN_CONFIDENCE=0.2
 LLM_EXTRACT_ON_CAPTURE=false
 EOF
