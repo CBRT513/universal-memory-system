@@ -8,7 +8,7 @@
       "recommended_for": ["backend", "frontend", "api", "devops", "security", "architecture"]
     },
     "haiku": {
-      "name": "claude-3-5-haiku-latest",
+      "name": "claude-haiku-4-5-20251001",
       "description": "Fast and efficient for simpler tasks, code reviews, and documentation",
       "max_tokens": 4096,
       "temperature": 0.3,
